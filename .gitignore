@@ -1,0 +1,8 @@
+# ignore virtual enviroment
+/flask-server/venv
+
+# ignore evnviroment variables
+/flask-server/.env
+
+
+/client/node_modules
