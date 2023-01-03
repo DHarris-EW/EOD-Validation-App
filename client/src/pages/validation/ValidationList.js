@@ -42,9 +42,9 @@ export default function ValidationList() {
 
 
     return (
-        <div className="w-100">
+        <div className="w-100 text-center">
             <h1 className="text-center">Validation List</h1>
-            <Row>
+            <Row className="justify-content-center">
                 {validations &&
                     Object.values(validations).map(validation => (
                         <Col key={validation.id} xs={12} lg={6}>
