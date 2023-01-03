@@ -17,8 +17,8 @@ import ValidationCreate from "./pages/validation/ValidationCreate";
 import ValidationAssess from "./pages/validation/ValidationAssess";
 import useMessage from "./hooks/useMessage";
 import ValidationList from "./pages/validation/ValidationList";
-import AssessPink from "./pages/pinks/assessPink";
-import ViewPink from "./pages/pinks/viewPink";
+import Pink from "./pages/Pink";
+import Portal from "./pages/portal";
 
 export default function App() {
     const { auth } = useAuth()
@@ -43,9 +43,12 @@ export default function App() {
                             <Route path="/validation/create" element={<ValidationCreate />} />
                             <Route path="/validation/assess" element={<ValidationList />} />
                             <Route path="/validation/assess/:title" element={<ValidationAssess />} />
-                            <Route path="/pink/assess/:title/:serviceNumber" element={<AssessPink />} />
-                            <Route path="/pink/view/:title/:serviceNumber" element={<ViewPink />} />
+                            {/* state = "create" */}
+                            <Route path="/pink-management/validation/:title/user/:userID/:state" element={<Pink />} />
+                            {/* state = "edit" or "read" */}
+                            <Route path="/pink-management/pink/:pinkID/:state" element={<Pink />} />
                             <Route path="/registration" element={<Registration />} />
+                            <Route path="/user/:userID/portal/" element={<Portal />} />
                         </Route>
 
                         {/* Catch all page missing */}

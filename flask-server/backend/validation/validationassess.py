@@ -6,6 +6,11 @@ from ..models import User, Validation
 val_assess = Blueprint("validation2", __name__, url_prefix="/validation/assess")
 
 
+# /validation/create
+# /validation/update/<id>
+# /validation/read/<id>
+# pass validation as a prop
+
 @val_assess.route("/validation-list", methods=["POST"])
 @jwt_required(locations=["cookies"])
 def validation_collect():

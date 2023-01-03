@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 export default function ValidationList() {
 
     const [validations, setValidations] = useState()
-    const [assessing, setAssessing] = useState(false)
     const { setAuth } = useAuth()
     const navigate = useNavigate()
 

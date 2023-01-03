@@ -70,7 +70,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
 def auth():
     claims = get_jwt()
     if claims:
-        return jsonify({"auth": {"serviceNumber": current_user.service_number, "is_admin": claims["is_admin"]}}), 200
+        return jsonify({"auth": {"name": current_user.name, "serviceNumber": current_user.service_number, "id": current_user.id, "is_admin": claims["is_admin"]}}), 200
     else:
         return jsonify({"msg": "no auth"}), 403
 
@@ -121,7 +121,7 @@ def login():
     user = User.query.filter_by(service_number=service_number).one_or_none()
 
     if password == user.password:
-        response = jsonify({"msg": {"text": "Login Successful!", "type": "success"}, "auth": {"serviceNumber": user.service_number, "is_admin": user.is_admin}})
+        response = jsonify({"msg": {"text": "Login Successful!", "type": "success"}, "auth": {"id": user.id, "name": user.name, "serviceNumber": user.service_number, "is_admin": user.is_admin}})
         access_token = create_access_token(identity=user, additional_claims={"is_admin": user.is_admin})
         set_access_cookies(response, access_token)
 

@@ -14,6 +14,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     service_number = db.Column(db.String(8), unique=True, nullable=False)
     name = db.Column(db.String(15), nullable=False)
+    assessment_type = db.Column(db.String(15), nullable=False)
     password = db.Column(db.String(15), nullable=False)
     is_admin = db.Column(db.Boolean(), nullable=False)
     teams = db.relationship("Team", secondary=user_teams, back_populates="users")
@@ -58,6 +59,7 @@ class UserPink(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     operator = db.relationship("User", foreign_keys=[user_id], back_populates="pink_operator")
     pink_version_id = db.Column(db.Integer, db.ForeignKey("pink_version.id"), nullable=False)
+    pink_version = db.relationship("PinkVersion", back_populates="user_pinks")
     authorisation_exercise = db.Column(db.String(50), nullable=False)
     assessor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     assessor = db.relationship("User", foreign_keys=[assessor_id], back_populates="pink_assessor")
@@ -81,6 +83,7 @@ class PinkVersion(db.Model):
     name = db.Column(db.String(15), unique=True, nullable=False)
     total_score = db.Column(db.Integer, nullable=False)
     criteria = db.relationship("Criteria", secondary=pink_criteria, back_populates="pink_version")
+    user_pinks = db.relationship("UserPink", back_populates="pink_version")
 
 
 class Criteria(db.Model):

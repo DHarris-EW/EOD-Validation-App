@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
         }).then(r => {
             if (r.status === 200){
                 r.json().then(d => {
-                    setAuth({"serviceNumber": d.auth.serviceNumber, "is_admin": d.auth.is_admin})
+                    setAuth({"id": d.auth.id, "name": d.auth.name, "serviceNumber": d.auth.serviceNumber, "is_admin": d.auth.is_admin})
                     setIsLoading(false)
                  })
             } else {

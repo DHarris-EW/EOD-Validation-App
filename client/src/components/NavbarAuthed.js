@@ -41,6 +41,12 @@ export default function NavbarAuthed() {
                             <span className={sidebar ? "text active" : "text"}>Assess</span>
                         </Link>
                     </li>
+                    <li className="sidebar-item">
+                        <Link to={`/user/${auth.id}/portal`}>
+                            <FaBook className="icon" size={35}/>
+                            <span className={sidebar ? "text active" : "text"}>Portal</span>
+                        </Link>
+                    </li>
                     {auth.is_admin &&
                         <li className="sidebar-item">
                             <Link to="/registration">

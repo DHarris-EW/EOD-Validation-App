@@ -43,7 +43,7 @@ export default function Login() {
             .then(res => {
                 if (res.status === 200) {
                     res.json().then(d => {
-                        setAuth({"serviceNumber": d.auth.serviceNumber, "is_admin": d.auth.is_admin})
+                        setAuth({"id": d.auth.id, "name": d.auth.name, "serviceNumber": d.auth.serviceNumber, "is_admin": d.auth.is_admin})
                         setMessage({"text": d.msg.text, "type": d.msg.type})
                     })
                 }

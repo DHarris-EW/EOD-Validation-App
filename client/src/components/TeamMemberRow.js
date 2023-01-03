@@ -5,6 +5,7 @@ import getCookie from "../services/GetCookie";
 import {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {Card} from "react-bootstrap";
+import PinkList from "./PinkList";
 
 
 export default function TeamMemberRow(props) {
@@ -15,40 +16,26 @@ export default function TeamMemberRow(props) {
     const [memberPinks, setMemberPinks] = useState()
     const navigate = useNavigate()
 
-    function assessBtnHandler(e) {
-        const { value } = e.target
-
-        navigate(`/pink/assess/${title}/${value}`)
+    function assessBtnHandler() {
+        navigate(`/pink-management/validation/${title}/user/${member.id}/create`)
     }
 
-
     function viewBtnHandler(e) {
-        const { value } = e.target
          setExpand(!expand)
 
-        const operator = member
         if (!memberPinks) {
-            fetch(`/pink/operator/${operator.serviceNumber}/list/${title}`, {
+            fetch(`/pink-management/validation/${title}/user/${member.id}/read`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
-                    "X-CSRF-TOKEN": getCookie('csrf_access_token'),
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    ...operator
-                })
+                    "X-CSRF-TOKEN": getCookie('csrf_access_token')
+                }
             }).then(r => {
                 r.json().then(d => {
-
                     setMemberPinks({...d})
                 })
             })
         }
-    }
-
-    function viewBtnHandler2() {
-
     }
 
     return (
@@ -72,7 +59,6 @@ export default function TeamMemberRow(props) {
                     <Col>
                         <Button
                             variant="success"
-                            value={member.serviceNumber}
                             onClick={assessBtnHandler}
                         >
                             Assess
@@ -80,35 +66,7 @@ export default function TeamMemberRow(props) {
                     </Col>
                 </Row>
                 {expand && memberPinks &&
-                    Object.values(memberPinks).map((pink, index) => {
-                        return (
-                            <Row key={index}>
-                                <Card>
-                                    <Card.Body>
-                                        <Row>
-                                            <Col>
-                                                Task Number: {pink.taskNumber}
-                                            </Col>
-                                            <Col>
-                                                Task Description: {pink.briefTaskDescription}
-                                            </Col>
-                                            <Col>
-                                                Assessor: {pink.assessor}
-                                            </Col>
-                                            <Col>
-                                                <Button
-                                                    variant="success"
-                                                    onClick={viewBtnHandler2}
-                                                >
-                                                    open
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Card.Body>
-                                </Card>
-                            </Row>
-                        )
-                    })
+                    <PinkList pinks={memberPinks} />
                 }
             </Card.Body>
         </Card>
