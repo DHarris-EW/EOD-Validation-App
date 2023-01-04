@@ -55,38 +55,32 @@ export default function Registration() {
     }
 
     return (
-        <>
-            {auth.is_admin ?
-             <Form noValidate validated={validated}>
-                <h1>Registration</h1>
-                <Form.Group className="">
-                    <Form.Label>Nominal Roll</Form.Label>
-                    <Form.Control
-                        name="nominalRoll"
-                        type="file"
-                        accept=".csv"
-                        onChange={changeHandler}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    {errorMessage &&
-                        <Form.Text className="text-danger">
-                            {errorMessage}
-                        </Form.Text>
-                    }
-                </Form.Group>
-                <Button
-                    variant={errorMessage ? "danger" : "primary"}
-                    type="sumbit"
-                    onClick={handleClick}
-                    disabled={errorMessage}
-                >
-                    Register
-                </Button>
-            </Form> :
-                navigate("/home")
-            }
-        </>
-
+         <Form noValidate validated={validated}>
+            <h1>Registration</h1>
+            <Form.Group className="">
+                <Form.Label>Nominal Roll</Form.Label>
+                <Form.Control
+                    name="nominalRoll"
+                    type="file"
+                    accept=".csv"
+                    onChange={changeHandler}
+                />
+            </Form.Group>
+            <Form.Group className="mb-3">
+                {errorMessage &&
+                    <Form.Text className="text-danger">
+                        {errorMessage}
+                    </Form.Text>
+                }
+            </Form.Group>
+            <Button
+                variant={errorMessage ? "danger" : "primary"}
+                type="sumbit"
+                onClick={handleClick}
+                disabled={errorMessage}
+            >
+                Register
+            </Button>
+        </Form>
     )
 }

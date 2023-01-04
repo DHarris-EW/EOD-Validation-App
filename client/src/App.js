@@ -38,17 +38,21 @@ export default function App() {
                         <Route path="/logout" element={<Logout />}/>
 
                         {/* Private routes */}
-                        <Route element={<RequireAuth />}>
+                        <Route element={<RequireAuth allowedRoles={["user"]} />}>
                             <Route path="/home" element={<Home />} />
+                            <Route path="/user/:userID/portal/" element={<Portal />} />
+                        </Route>
+
+                        <Route element={<RequireAuth allowedRoles={["ds"]} />}>
+                            <Route path="/pink-management/validation/:title/user/:userID/:state" element={<Pink />} />
+                            <Route path="/pink-management/pink/:pinkID/:state" element={<Pink />} />
+                        </Route>
+
+                        <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+                            <Route path="/registration" element={<Registration />} />
                             <Route path="/validation/create" element={<ValidationCreate />} />
                             <Route path="/validation/assess" element={<ValidationList />} />
                             <Route path="/validation/assess/:title" element={<ValidationAssess />} />
-                            {/* state = "create" */}
-                            <Route path="/pink-management/validation/:title/user/:userID/:state" element={<Pink />} />
-                            {/* state = "edit" or "read" */}
-                            <Route path="/pink-management/pink/:pinkID/:state" element={<Pink />} />
-                            <Route path="/registration" element={<Registration />} />
-                            <Route path="/user/:userID/portal/" element={<Portal />} />
                         </Route>
 
                         {/* Catch all page missing */}

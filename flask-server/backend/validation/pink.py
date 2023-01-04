@@ -191,33 +191,37 @@ def user_pinks_by_validation(validation_title, user_id):
 def pink_by_id(pink_id):
 
     user_pink = UserPink.query.filter_by(id=pink_id).one()
-
-    sections = {}
-    header_ids = []
-
-    for criteria in user_pink.pink_version.criteria:
-        if criteria.header.id not in header_ids:
-            header_ids.append(criteria.header.id)
-            sections[criteria.header.name] = {"index": len(header_ids) - 1,
-                                              "id": criteria.header.id,
-                                              "passed": True,
-                                              "score": user_pink.header_scores[criteria.header.id - 1].score,
-                                              "criteriaGroup": {}}
-
-        sections[criteria.header.name]["criteriaGroup"][criteria.name] = {"id": criteria.id,
-                                                                          "safety": criteria.safety,
-                                                                          "score": user_pink.criteria_scores[
-                                                                              criteria.id - 1].score}
-
-    response = {"authorisationExercise": user_pink.authorisation_exercise,
-                "operator": {"id": user_pink.operator.id, "serviceNumber": user_pink.operator.service_number},
-                "assessor": {"id": user_pink.assessor.id, "serviceNumber": user_pink.assessor.service_number},
-                "briefTaskDescription": user_pink.brief_task_description, "taskNumber": user_pink.task_number,
-                "version": {"name": user_pink.pink_version.name, "id": user_pink.pink_version.id},
-                "totalScore": user_pink.pink_version.total_score,
-                "score": user_pink.score,
-                "passed": user_pink.passed,
-                "ready": False,
-                "sections": sections}
-
-    return jsonify(response)
+    
+    if user_pink.operator.service_number == current_user.service_number or user_pink.assessor.service_number == current_user.service_number:
+        sections = {}
+        header_ids = []
+    
+        for criteria in user_pink.pink_version.criteria:
+            if criteria.header.id not in header_ids:
+                header_ids.append(criteria.header.id)
+                sections[criteria.header.name] = {"index": len(header_ids) - 1,
+                                                  "id": criteria.header.id,
+                                                  "passed": True,
+                                                  "score": user_pink.header_scores[criteria.header.id - 1].score,
+                                                  "criteriaGroup": {}}
+    
+            sections[criteria.header.name]["criteriaGroup"][criteria.name] = {"id": criteria.id,
+                                                                              "safety": criteria.safety,
+                                                                              "score": user_pink.criteria_scores[
+                                                                                  criteria.id - 1].score}
+    
+        response = {"authorisationExercise": user_pink.authorisation_exercise,
+                    "operator": {"id": user_pink.operator.id, "serviceNumber": user_pink.operator.service_number},
+                    "assessor": {"id": user_pink.assessor.id, "serviceNumber": user_pink.assessor.service_number},
+                    "briefTaskDescription": user_pink.brief_task_description, "taskNumber": user_pink.task_number,
+                    "version": {"name": user_pink.pink_version.name, "id": user_pink.pink_version.id},
+                    "totalScore": user_pink.pink_version.total_score,
+                    "score": user_pink.score,
+                    "passed": user_pink.passed,
+                    "ready": False,
+                    "sections": sections}
+    
+        return jsonify(response)
+    
+    else:
+        return jsonify("You are trying to open a pink that does not belong to you or that you are not the assessor of!")

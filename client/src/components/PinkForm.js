@@ -108,8 +108,6 @@ export default function PinkForm(props) {
         })
     }
 
-    console.log(pinkData)
-
     return (
         <Form noValidate validated={validated} onSubmit={sumbitHandler}>
             <Form.Group>

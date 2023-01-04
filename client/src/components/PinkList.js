@@ -3,10 +3,12 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import {useNavigate} from "react-router-dom";
 import {ListGroup} from "react-bootstrap";
+import useAuth from "../hooks/useAuth";
 
 
 export default function PinkList(props) {
 
+    const { auth } = useAuth()
     const { pinks, portalView } = props
     const navigate = useNavigate()
 
@@ -50,7 +52,7 @@ export default function PinkList(props) {
                             <Col md={3}>
                                 {portalView ? data.passed : data.assessor.serviceNumber}
                             </Col>
-                            {!portalView &&
+                            {!portalView && auth.serviceNumber === data.assessor.serviceNumber &&
                             <Col>
                                 <Button
                                     variant="success"

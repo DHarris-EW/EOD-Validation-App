@@ -21,3 +21,22 @@ def admin_required():
         return decorator
 
     return wrapper
+
+
+def is_ds():
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            try:
+                claims = get_jwt()
+                print(claims["is_ds"])
+                if claims["is_ds"]:
+                    return fn(*args, **kwargs)
+                else:
+                    return jsonify({"msg": "You need to be a DS!"}), 403
+            except KeyError:
+                return jsonify({"msg": "User does not have a role"})
+        return decorator
+
+    return wrapper

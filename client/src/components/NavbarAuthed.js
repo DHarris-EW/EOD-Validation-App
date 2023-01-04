@@ -29,31 +29,35 @@ export default function NavbarAuthed() {
                             <span className={sidebar ? "text active" : "text"}>Home</span>
                         </Link>
                     </li>
-                    <li className="sidebar-item">
-                        <Link to="/validation/create">
-                            <FaBook className="icon" size={35}/>
-                            <span className={sidebar ? "text active" : "text"}>Validation</span>
-                        </Link>
-                    </li>
-                    <li className="sidebar-item">
-                        <Link to="/validation/assess">
-                            <FaBook className="icon" size={35}/>
-                            <span className={sidebar ? "text active" : "text"}>Assess</span>
-                        </Link>
-                    </li>
+                    {auth.roles.includes("ds") &&
+                        <li className="sidebar-item">
+                            <Link to="/validation/assess">
+                                <FaBook className="icon" size={35}/>
+                                <span className={sidebar ? "text active" : "text"}>Assess</span>
+                            </Link>
+                        </li>
+                    }
                     <li className="sidebar-item">
                         <Link to={`/user/${auth.id}/portal`}>
                             <FaBook className="icon" size={35}/>
                             <span className={sidebar ? "text active" : "text"}>Portal</span>
                         </Link>
                     </li>
-                    {auth.is_admin &&
+                    {auth.roles.includes("admin") &&
+                        <>
                         <li className="sidebar-item">
                             <Link to="/registration">
                                 <FaAddressBook className="icon" size={35}/>
                                 <span className={sidebar ? "text active" : "text"}>Registration</span>
                             </Link>
                         </li>
+                        <li className="sidebar-item">
+                            <Link to="/validation/create">
+                                <FaBook className="icon" size={35}/>
+                                <span className={sidebar ? "text active" : "text"}>Validation</span>
+                            </Link>
+                        </li>
+                        </>
                     }
                     <li className="sidebar-item bottom">
                         <Link to="/logout">

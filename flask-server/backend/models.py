@@ -17,6 +17,7 @@ class User(db.Model):
     assessment_type = db.Column(db.String(15), nullable=False)
     password = db.Column(db.String(15), nullable=False)
     is_admin = db.Column(db.Boolean(), nullable=False)
+    is_ds = db.Column(db.Boolean(), nullable=False)
     teams = db.relationship("Team", secondary=user_teams, back_populates="users")
     pink_operator = db.relationship("UserPink", back_populates="operator", foreign_keys="UserPink.user_id")
     pink_assessor = db.relationship("UserPink", back_populates="assessor", foreign_keys="UserPink.assessor_id")
