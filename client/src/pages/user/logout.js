@@ -1,10 +1,12 @@
-import React, {useEffect} from "react";
-import getCookie from "../services/GetCookie";
-import useAuth from "../hooks/useAuth";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useMessage from "../hooks/useMessage";
+
+import getCookie from "../../services/GetCookie";
+import useAuth from "../../hooks/useAuth";
+import useMessage from "../../hooks/useMessage";
 
 export default function Logout(){
+
     const { setAuth } = useAuth()
     const { setMessage } = useMessage()
     const navigate = useNavigate()

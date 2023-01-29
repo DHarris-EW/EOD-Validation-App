@@ -1,5 +1,7 @@
 import {createContext, useEffect, useState} from "react"
 import getCookie from "../services/GetCookie";
+import AppNavBar from "../components/navbar/AppNavBar";
+import {useNavigate} from "react-router-dom";
 
 const AuthContext = createContext({})
 
@@ -33,7 +35,7 @@ export function AuthProvider({ children }) {
                 <AuthContext.Provider value={{ auth, setAuth, persist, setPersist }}>
                     {children}
                 </AuthContext.Provider>
-            : <h1>loading</h1>}
+            : <AppNavBar />}
         </>
     )
 }

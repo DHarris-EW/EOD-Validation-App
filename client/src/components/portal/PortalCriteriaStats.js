@@ -1,24 +1,24 @@
-import {ListGroup} from "react-bootstrap";
+import ListGroup from "react-bootstrap/ListGroup";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
 
 export default function PortalCriteriaStats(props) {
 
-    const { criteriaScoreFrequency } = props
+    const { criteriaAverage } = props
 
     return (
         <ListGroup horizontal className="mb-3">
-            {Object.entries(criteriaScoreFrequency).map(([score, criteria], i) => {
+            {Object.entries(criteriaAverage).map(([score, criteria], i) => {
                 return (
                     <ListGroup.Item key={i} className="p-0">
                         <ListGroup variant="flush">
                             <ListGroup.Item>
                                 <h3 className="m-0">{score}</h3>
                             </ListGroup.Item>
-                        {Object.entries(criteria).sort((criteriaName, scoreFreq) => ( scoreFreq[1] - criteriaName[1] ))
+                        {Object.entries(criteria).sort((criteriaName, scoreAvg) => ( scoreAvg[1] - criteriaName[1] ))
                             .slice(0,3)
-                            .map(([criteriaName, scoreFreq], j) => {
+                            .map(([criteriaName, scoreAvg], j) => {
                                 return (
                                     <ListGroup.Item key={j}>
                                         <Row>
@@ -26,7 +26,7 @@ export default function PortalCriteriaStats(props) {
                                                 <h5 className="m-0">{criteriaName}</h5>
                                             </Col>
                                             <Col md={1}>
-                                                <h5 className="m-0">{scoreFreq}</h5>
+                                                <h5 className="m-0">{scoreAvg}</h5>
                                             </Col>
                                         </Row>
                                     </ListGroup.Item>

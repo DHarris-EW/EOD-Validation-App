@@ -3,6 +3,126 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+# VALIDATION
+
+class Validation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), nullable=False)
+    date_from = db.Column(db.String(15), nullable=False)
+    date_to = db.Column(db.String(15), nullable=False)
+    teams = db.relationship("Team", back_populates="validation")
+
+
+# PINK
+
+class UserPinkECMCriteria(db.Model):
+    user_pink_id = db.Column(db.Integer, db.ForeignKey("user_pink_ecm.id"), nullable=False, primary_key=True)
+    pink = db.relationship("UserPinkECM", back_populates="criteria")
+    criteria_id = db.Column(db.Integer, db.ForeignKey("criteria.id"), nullable=False, primary_key=True)
+    score = db.Column(db.Float, nullable=False)
+
+
+class UserPinkECMSection(db.Model):
+    user_pink_id = db.Column(db.Integer, db.ForeignKey("user_pink_ecm.id"), nullable=False, primary_key=True)
+    pink = db.relationship("UserPinkECM", back_populates="sections")
+    section_id = db.Column(db.Integer, db.ForeignKey("section.id"), nullable=False, primary_key=True)
+    score = db.Column(db.Float, nullable=False)
+    performance_comments = db.Column(db.String(250), nullable=False)
+    percentage_adjustment = db.Column(db.Float, nullable=False)
+
+
+class UserPinkEODCriteria(db.Model):
+    user_pink_id = db.Column(db.Integer, db.ForeignKey("user_pink_eod.id"), nullable=False, primary_key=True)
+    pink = db.relationship("UserPinkEOD", back_populates="criteria")
+    criteria_id = db.Column(db.Integer, db.ForeignKey("criteria.id"), nullable=False, primary_key=True)
+    score = db.Column(db.Float, nullable=False)
+
+
+class UserPinkEODSection(db.Model):
+    user_pink_id = db.Column(db.Integer, db.ForeignKey("user_pink_eod.id"), nullable=False, primary_key=True)
+    pink = db.relationship("UserPinkEOD", back_populates="sections")
+    section_id = db.Column(db.Integer, db.ForeignKey("section.id"), nullable=False, primary_key=True)
+    score = db.Column(db.Float, nullable=False)
+    performance_comments = db.Column(db.String(250), nullable=False)
+    percentage_adjustment = db.Column(db.Float, nullable=False)
+
+
+class UserPinkECM(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    pink_version_id = db.Column(db.Integer, db.ForeignKey("pink_version.id"), nullable=False)
+    authorisation_exercise = db.Column(db.String(50), nullable=False)
+    assessor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    brief_task_description = db.Column(db.String(100), nullable=False)
+    task_number = db.Column(db.String(50), nullable=False)
+    assessment_number = db.Column(db.Integer, nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    passed = db.Column(db.Boolean, nullable=False)
+    operator = db.relationship("User", foreign_keys=[user_id])
+    assessor = db.relationship("User", foreign_keys=[assessor_id])
+    pink_version = db.relationship("PinkVersion")
+    criteria = db.relationship("UserPinkECMCriteria", back_populates="pink")
+    sections = db.relationship("UserPinkECMSection", back_populates="pink")
+
+
+class UserPinkEOD(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    pink_version_id = db.Column(db.Integer, db.ForeignKey("pink_version.id"), nullable=False)
+    authorisation_exercise = db.Column(db.String(50), nullable=False)
+    assessor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    brief_task_description = db.Column(db.String(100), nullable=False)
+    task_number = db.Column(db.String(50), nullable=False)
+    assessment_number = db.Column(db.Integer, nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    time_of_arrival = db.Column(db.String(25), nullable=False)
+    time_of_action = db.Column(db.String(25), nullable=False)
+    subjective_score = db.Column(db.String(25), nullable=False)
+    re_score = db.Column(db.String(25), nullable=False)
+    passed = db.Column(db.Boolean, nullable=False)
+    operator = db.relationship("User", foreign_keys=[user_id])
+    assessor = db.relationship("User", foreign_keys=[assessor_id])
+    pink_version = db.relationship("PinkVersion")
+    criteria = db.relationship("UserPinkEODCriteria", back_populates="pink")
+    sections = db.relationship("UserPinkEODSection", back_populates="pink")
+
+
+pink_criteria = db.Table(
+    "pink_criteria",
+    db.Column("pink_version_id", db.Integer, db.ForeignKey("pink_version.id"), nullable=False),
+    db.Column("criteria_id", db.Integer, db.ForeignKey("criteria.id"), nullable=False)
+)
+
+criteria_section = db.Table(
+    "criteria_section",
+    db.Column("criteria_id", db.Integer, db.ForeignKey("criteria.id"), nullable=False),
+    db.Column("section_id", db.Integer, db.ForeignKey("section.id"), nullable=False)
+)
+
+
+class PinkVersion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), unique=True, nullable=False)
+    total_score = db.Column(db.Integer, nullable=False)
+    criteria = db.relationship("Criteria", secondary=pink_criteria, back_populates="pink_version")
+
+
+class Criteria(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    safety = db.Column(db.Boolean, nullable=False)
+    section = db.relationship("Section", secondary=criteria_section, back_populates="criteria")
+    pink_version = db.relationship("PinkVersion", secondary=pink_criteria, back_populates="criteria")
+
+
+class Section(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    criteria = db.relationship("Criteria", secondary=criteria_section, back_populates="section")
+
+
+# USER
+
 user_teams = db.Table(
     "user_teams",
     db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
@@ -14,21 +134,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     service_number = db.Column(db.String(8), unique=True, nullable=False)
     name = db.Column(db.String(15), nullable=False)
-    assessment_type = db.Column(db.String(15), nullable=False)
+    job_role = db.Column(db.String(15), nullable=False)
     password = db.Column(db.String(15), nullable=False)
     is_admin = db.Column(db.Boolean(), nullable=False)
     is_ds = db.Column(db.Boolean(), nullable=False)
     teams = db.relationship("Team", secondary=user_teams, back_populates="users")
-    pink_operator = db.relationship("UserPink", back_populates="operator", foreign_keys="UserPink.user_id")
-    pink_assessor = db.relationship("UserPink", back_populates="assessor", foreign_keys="UserPink.assessor_id")
-
-
-class Validation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(15), unique=True, nullable=False)
-    date_from = db.Column(db.String(10), nullable=False)
-    date_to = db.Column(db.String(10), nullable=False)
-    teams = db.relationship("Team", back_populates="validation")
 
 
 class Team(db.Model):
@@ -37,68 +147,3 @@ class Team(db.Model):
     validation_id = db.Column(db.Integer, db.ForeignKey("validation.id"), nullable=False)
     validation = db.relationship("Validation", back_populates="teams")
     users = db.relationship("User", secondary=user_teams, back_populates="teams")
-
-
-class UserPinkCriteriaScore(db.Model):
-    user_pink_id = db.Column(db.Integer, db.ForeignKey("user_pink.id"), nullable=False, primary_key=True)
-    pink = db.relationship("UserPink", back_populates="criteria_scores")
-    criteria_id = db.Column(db.Integer, db.ForeignKey("criteria.id"), nullable=False, primary_key=True)
-    criteria = db.relationship("Criteria", back_populates="user_pink_criteria_score")
-    score = db.Column(db.Float, nullable=False)
-
-
-class UserPinkHeaderScore(db.Model):
-    user_pink_id = db.Column(db.Integer, db.ForeignKey("user_pink.id"), nullable=False, primary_key=True)
-    pink = db.relationship("UserPink", back_populates="header_scores")
-    criteria_header_id = db.Column(db.Integer, db.ForeignKey("criteria_header.id"), nullable=False, primary_key=True)
-    criteria_headers = db.relationship("CriteriaHeader", back_populates="user_pink_header_score")
-    score = db.Column(db.Float, nullable=False)
-
-
-class UserPink(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    operator = db.relationship("User", foreign_keys=[user_id], back_populates="pink_operator")
-    pink_version_id = db.Column(db.Integer, db.ForeignKey("pink_version.id"), nullable=False)
-    pink_version = db.relationship("PinkVersion", back_populates="user_pinks")
-    authorisation_exercise = db.Column(db.String(50), nullable=False)
-    assessor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    assessor = db.relationship("User", foreign_keys=[assessor_id], back_populates="pink_assessor")
-    brief_task_description = db.Column(db.String(100), nullable=False)
-    task_number = db.Column(db.Integer, nullable=False)
-    criteria_scores = db.relationship("UserPinkCriteriaScore", back_populates="pink")
-    header_scores = db.relationship("UserPinkHeaderScore", back_populates="pink")
-    score = db.Column(db.Integer, nullable=False)
-    passed = db.Column(db.Boolean, nullable=False)
-
-
-pink_criteria = db.Table(
-    "pink_criteria",
-    db.Column("pink_version_id", db.Integer, db.ForeignKey("pink_version.id"), nullable=False),
-    db.Column("criteria_id", db.Integer, db.ForeignKey("criteria.id"), nullable=False)
-)
-
-
-class PinkVersion(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(15), unique=True, nullable=False)
-    total_score = db.Column(db.Integer, nullable=False)
-    criteria = db.relationship("Criteria", secondary=pink_criteria, back_populates="pink_version")
-    user_pinks = db.relationship("UserPink", back_populates="pink_version")
-
-
-class Criteria(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    safety = db.Column(db.Boolean, nullable=False)
-    header_id = db.Column(db.Integer, db.ForeignKey("criteria_header.id"), nullable=False)
-    header = db.relationship("CriteriaHeader", back_populates="criteria")
-    user_pink_criteria_score = db.relationship("UserPinkCriteriaScore", back_populates="criteria")
-    pink_version = db.relationship("PinkVersion", secondary=pink_criteria, back_populates="criteria")
-
-
-class CriteriaHeader(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    user_pink_header_score = db.relationship("UserPinkHeaderScore", back_populates="criteria_headers")
-    criteria = db.relationship("Criteria", back_populates="header")

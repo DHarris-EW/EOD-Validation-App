@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
-import {useNavigate} from "react-router-dom";
-import {ListGroup} from "react-bootstrap";
-import useAuth from "../hooks/useAuth";
+import ListGroup from "react-bootstrap/ListGroup";
+
+import useAuth from "../../hooks/useAuth";
 
 
 export default function PinkList(props) {
@@ -14,7 +16,6 @@ export default function PinkList(props) {
 
     function viewBtnHandler2(e) {
         const { value } = e.target
-
         navigate(`/pink-management/pink/${value}/read`)
     }
 
@@ -23,6 +24,8 @@ export default function PinkList(props) {
 
         navigate(`/pink-management/pink/${value}/edit`)
     }
+
+
 
     return (
         <ListGroup>
@@ -50,9 +53,9 @@ export default function PinkList(props) {
                                 {portalView ? data.authorisation_exercise : data.briefTaskDescription}
                             </Col>
                             <Col md={3}>
-                                {portalView ? data.passed : data.assessor.serviceNumber}
+                                {portalView ? data.passed ? "Passed" : "Failed" : data.assessor}
                             </Col>
-                            {!portalView && auth.serviceNumber === data.assessor.serviceNumber &&
+                            {!portalView && auth.serviceNumber === data.assessor &&
                             <Col>
                                 <Button
                                     variant="success"

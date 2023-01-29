@@ -5,19 +5,15 @@ import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useState } from "react";
-import useAuth from "../hooks/useAuth";
-import {useNavigate} from "react-router-dom";
-import getCookie from "../services/GetCookie";
-import useMessage from "../hooks/useMessage";
+import getCookie from "../../services/GetCookie";
+import useMessage from "../../hooks/useMessage";
 
 export default function Registration() {
-    const { auth } = useAuth()
+
     const { setMessage } = useMessage()
     const [errorMessage, setErrorMessage] = useState()
     const [selectedFile, setSelectedFile] = useState()
     const [validated, setValidated] = useState()
-
-    const navigate = useNavigate()
 
     function changeHandler(event) {
         const file = event.target.files[0]

@@ -5,26 +5,26 @@ import getCookie from "../services/GetCookie";
 import {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {Card} from "react-bootstrap";
-import PinkList from "./PinkList";
+import PinkList from "./pink/PinkList";
 
 
 export default function TeamMemberRow(props) {
     const { member } = props
-    const {title} = useParams()
+    const { validation_id } = useParams()
 
     const [expand, setExpand] = useState(false)
     const [memberPinks, setMemberPinks] = useState()
     const navigate = useNavigate()
 
     function assessBtnHandler() {
-        navigate(`/pink-management/validation/${title}/user/${member.id}/create`)
+        navigate(`/pink-management/validation/${validation_id}/user/${member.id}/${member.pinkType}/create`, {state:{"member": "asd"}})
     }
 
-    function viewBtnHandler(e) {
+    function viewBtnHandler() {
          setExpand(!expand)
 
         if (!memberPinks) {
-            fetch(`/pink-management/validation/${title}/user/${member.id}/read`, {
+            fetch(`/pink-management/validation/${validation_id}/user/${member.id}/read`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -70,7 +70,6 @@ export default function TeamMemberRow(props) {
                 }
             </Card.Body>
         </Card>
-
     )
 
 }

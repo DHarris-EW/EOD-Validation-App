@@ -1,10 +1,11 @@
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import getCookie from "../services/GetCookie";
 import useAuth from "../hooks/useAuth";
+import {Accordion, Nav, Tab, Tabs} from "react-bootstrap";
+import { FaPlus, FaMinus, FaSearch } from 'react-icons/fa';
 
 export default function AccordionTeams(props) {
     const { setAuth } = useAuth()
@@ -18,15 +19,18 @@ export default function AccordionTeams(props) {
                 const teamID = Object.keys(prevState).length + 1
                 return {
                     ...prevState,
-                    [teamID]: {"teamMembers": {}}
+                    [teamID]: {teamMembers: {1: {serviceNumber: "", valid: false}}}
                 }
             } else if (name === "delAccordion") {
-                const copy = {...prevState};
                 const lastItem = Object.keys(prevState).slice(-1)
-                if (lastItem) {
-                     delete copy[lastItem]
+                if (Object.keys(prevState).length > 1) {
+                     delete prevState[lastItem]
                     return{
-                        ...copy
+                        ...prevState
+                    }
+                } else {
+                    return{
+                        ...prevState
                     }
                 }
             }
@@ -37,6 +41,7 @@ export default function AccordionTeams(props) {
         const { name } = e.target
         const [ btnName, teamID ] = name.split("-")
 
+
         setTeams(prevState => {
             const copy = prevState[teamID]
 
@@ -44,20 +49,31 @@ export default function AccordionTeams(props) {
                 let newMemberID = Object.keys(copy.teamMembers).length + 1
                 return {
                     ...prevState,
-                    [teamID]: {...copy, "teamMembers":
-                            {...copy.teamMembers, [newMemberID]:
-                                {serviceNumber: "", name: "", valid: false}}
+                    [teamID]:
+                        {...copy,
+                            "teamMembers":
+                            {...copy.teamMembers,
+                                [newMemberID]:
+                                    {serviceNumber: "",
+                                        valid: false}}
                     }
                 }
             } else if (btnName === "btnDelMember") {
                 const lastItem = Object.keys(copy.teamMembers).slice(-1)
-                if (lastItem) {
+                console.log(lastItem)
+                if (Object.keys(copy.teamMembers).length > 1) {
                     delete copy.teamMembers[lastItem]
+                     return {
+                            ...prevState,
+                            [teamID]: {...copy}
+                        }
+                } else {
                     return {
-                        ...prevState,
-                        [teamID]: {...copy}
-                    }
+                            ...prevState,
+                            [teamID]: {...copy}
+                        }
                 }
+
             }
         })
     }
@@ -67,8 +83,6 @@ export default function AccordionTeams(props) {
         const teamID = name.split("-").slice(-1)
 
         function validateTeamMember(validatedUsers) {
-            // validatedUsers = {"1": true, "2": false}
-            // "1" = memberID
             Object.keys(validatedUsers).map(memberID => {
                 return (
                     setTeams(prevState => {
@@ -86,7 +100,7 @@ export default function AccordionTeams(props) {
             })
         }
 
-        fetch("/validation/lookup", {
+        fetch("/validation-management/member-lookup", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -107,7 +121,7 @@ export default function AccordionTeams(props) {
 
     function updateTeamMemberEntry(e) {
         const { name, value } = e.target
-        //Do not remove unused btnName
+
         const [ teamID, teamMemberID ] = name.split("-").slice(-2)
 
         setTeams(prevState => {
@@ -115,9 +129,13 @@ export default function AccordionTeams(props) {
 
             return {
                 ...prevState,
-                [teamID] : {...copy, "teamMembers":
-                        {...copy.teamMembers, [teamMemberID]:
-                                {...copy.teamMembers[teamMemberID], "serviceNumber": value}}
+                [teamID] :
+                    {...copy,
+                        "teamMembers":
+                            {...copy.teamMembers,
+                            [teamMemberID]:
+                                {...copy.teamMembers[teamMemberID],
+                                    "serviceNumber": value}}
                 }
             }
         })
@@ -126,65 +144,180 @@ export default function AccordionTeams(props) {
     return (
         <>
             <Row>
-                <Col>
-                    <Form.Group className="mb-3 text-center">
-                        <Form.Label>Teams</Form.Label>
-                    </Form.Group>
+                <Col className="text-center">
+                    <h2>Validation Teams</h2>
                 </Col>
             </Row>
-            <Row className="text-center mb-3">
-                <Accordion>
+            <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+            <Row className="p-3">
+                <Col xs={7} md={9} className="p-3 border">
+                    <Tab.Content>
+                {Object.keys(teams).map(teamID =>(
+                    <Tab.Pane eventKey={teamID} >
+                            {Object.keys(teams[teamID]["teamMembers"]).map(teamMemberID => (
+                                <Row key={teamMemberID}  className="align-items-center mb-2">
+                                    <Col>
+                                        <Form.Control
+                                            name={`teamMemberEntry-${teamID}-${teamMemberID}`}
+                                            value={teams[teamID].teamMembers[teamMemberID].serviceNumber}
+                                            placeholder={`Service Number`}
+                                            onChange={updateTeamMemberEntry}
+                                            className={teams[teamID].teamMembers[teamMemberID].valid ? "is-valid" : ""}
+                                            autoComplete="off"
+                                        />
+                                    </Col>
+                                </Row>
+                            ))}
+                            <Row className="justify-content-end">
+                                <Col xs={6} md={3} xl={3} className="mb-3">
+                                    <Button name={`btnAddMember-${teamID}`} onClick={teamMemberHandler} className="w-100">
+                                        <FaPlus />
+                                    </Button>
+                                </Col>
+                                <Col xs={6} md={3} xl={1} className="mb-3">
+                                    <Button name={`btnDelMember-${teamID}`} onClick={teamMemberHandler} className="w-100">
+                                        <FaMinus />
+                                    </Button>
+                                </Col>
+                                <Col xs={12} md={3} xl={1}>
+                                <Button name={`btnLookUp-${teamID}`} onClick={memberLookUpHandler} className="w-100">
+                                    <FaSearch />
+                                </Button>
+                                </Col>
+                            </Row>
+                        </Tab.Pane>
+
+                ))}
+                        </Tab.Content>
+                </Col>
+                <Col xs={5} md={3} className="border pt-3">
+                <Nav variant="pills" className="flex-column mb-2" >
                     {Object.keys(teams).map(teamID =>(
-                        <Accordion.Item eventKey={teamID} key={teamID}>
-                            <Accordion.Header>
-                                Team {teamID}
-                            </Accordion.Header>
-                            <Accordion.Body>
-                                {Object.keys(teams[teamID]["teamMembers"]).map(teamMemberID => (
-                                    <Row key={teamMemberID} className="align-items-center mb-2">
-                                        <Col xs={1} md={1}>
-                                            <Form.Label>
-                                                {teamMemberID}
-                                            </Form.Label>
-                                        </Col>
-                                        <Col xs={11} md={11}>
-                                            <Form.Control
-                                                name={`teamMemberEntry-${teamID}-${teamMemberID}`}
-                                                value={teams[teamID].teamMembers[teamMemberID].serviceNumber}
-                                                placeholder="ServiceNumber"
-                                                onChange={updateTeamMemberEntry}
-                                                className={teams[teamID].teamMembers[teamMemberID].valid ? "is-valid" : ""}
-                                                autoComplete="off"
-                                            />
-                                        </Col>
-                                    </Row>
-                                ))}
-                                <Button name={`btnAddMember-${teamID}`} onClick={teamMemberHandler}>
-                                    Add
-                                </Button>
-                                <Button name={`btnDelMember-${teamID}`} onClick={teamMemberHandler}>
-                                    Delete
-                                </Button>
-                                <Button name={`btnLookUp-${teamID}`} onClick={memberLookUpHandler}>
-                                    Search
-                                </Button>
-                            </Accordion.Body>
-                        </Accordion.Item>
+                        <Nav.Item className="text-center" >
+                          <Nav.Link eventKey={teamID} bsPrefix="btn" className="btn-outline-dark w-100 mb-1">Team {teamID}</Nav.Link>
+                        </Nav.Item>
                     ))}
-                </Accordion>
-            </Row>
-            <Row className="mb-3">
-                <Col className="text-center">
-                    <Button name="delAccordion" variant="danger" onClick={accordionHandler}>
-                        Delete
-                    </Button>
+                </Nav>
+                    <Row className="mb-3">
+                        <Col xs={12} className="text-center mb-2">
+                            <Button name="addAccordion" className="w-100" onClick={accordionHandler}>
+                                <FaPlus />
+                            </Button>
+                        </Col>
+                        <Col xs={12} className="text-center">
+                            <Button name="delAccordion" className="w-100" onClick={accordionHandler}>
+                                <FaMinus />
+                            </Button>
+                        </Col>
+                </Row>
                 </Col>
-                <Col className="text-center">
-                    <Button name="addAccordion" variant="success" onClick={accordionHandler}>
-                        Add
-                    </Button>
-                </Col>
             </Row>
+            </Tab.Container>
+            {/*<Tabs*/}
+            {/*    defaultActiveKey="1"*/}
+            {/*    id="fill-tab-example"*/}
+            {/*    className="mb-3"*/}
+            {/*    fill*/}
+            {/*>*/}
+            {/*    {Object.keys(teams).map(teamID =>(*/}
+            {/*        <Tab eventKey={teamID} title={`Team ${teamID}`}>*/}
+            {/*            <Row>*/}
+            {/*                <Col md={11}>*/}
+            {/*                     {Object.keys(teams[teamID]["teamMembers"]).map(teamMemberID => (*/}
+            {/*                        <Row key={teamMemberID} className="align-items-center mb-2">*/}
+            {/*                            <Col xs={1} md={1}>*/}
+            {/*                                <Form.Label>*/}
+            {/*                                    {teamMemberID}*/}
+            {/*                                </Form.Label>*/}
+            {/*                            </Col>*/}
+            {/*                            <Col xs={11} md={11}>*/}
+            {/*                                <Form.Control*/}
+            {/*                                    name={`teamMemberEntry-${teamID}-${teamMemberID}`}*/}
+            {/*                                    value={teams[teamID].teamMembers[teamMemberID].serviceNumber}*/}
+            {/*                                    placeholder="ServiceNumber"*/}
+            {/*                                    onChange={updateTeamMemberEntry}*/}
+            {/*                                    className={teams[teamID].teamMembers[teamMemberID].valid ? "is-valid" : ""}*/}
+            {/*                                    autoComplete="off"*/}
+            {/*                                />*/}
+            {/*                            </Col>*/}
+            {/*                        </Row>*/}
+            {/*                    ))}*/}
+            {/*                </Col>*/}
+            {/*                <Col md={1}>*/}
+            {/*                    <Row className="mb-3">*/}
+            {/*                        <Col>*/}
+            {/*                            <Button name={`btnAddMember-${teamID}`} onClick={teamMemberHandler}>*/}
+            {/*                                <FaPlus />*/}
+            {/*                            </Button>*/}
+            {/*                        </Col>*/}
+            {/*                    </Row>*/}
+            {/*                    <Row className="mb-3">*/}
+            {/*                        <Col>*/}
+            {/*                            <Button name={`btnDelMember-${teamID}`} onClick={teamMemberHandler}>*/}
+            {/*                                <FaMinus />*/}
+            {/*                            </Button>*/}
+            {/*                        </Col>*/}
+            {/*                    </Row>*/}
+            {/*                    <Row className="mb-3">*/}
+            {/*                        <Col>*/}
+            {/*                        <Button name={`btnLookUp-${teamID}`} onClick={memberLookUpHandler}>*/}
+            {/*                            <FaSearch />*/}
+            {/*                        </Button>*/}
+            {/*                        </Col>*/}
+            {/*                    </Row>*/}
+            {/*                </Col>*/}
+            {/*            </Row>*/}
+            {/*        </Tab>*/}
+            {/*    ))}*/}
+            {/*</Tabs>*/}
+            {/*<Row>*/}
+            {/*    <Col>*/}
+            {/*        <Form.Group className="mb-3 text-center">*/}
+            {/*            <Form.Label>Teams</Form.Label>*/}
+            {/*        </Form.Group>*/}
+            {/*    </Col>*/}
+            {/*</Row>*/}
+            {/*<Row className="text-center mb-3">*/}
+            {/*    <Accordion>*/}
+            {/*        {Object.keys(teams).map(teamID =>(*/}
+            {/*            <Accordion.Item eventKey={teamID} key={teamID}>*/}
+            {/*                <Accordion.Header>*/}
+            {/*                    Team {teamID}*/}
+            {/*                </Accordion.Header>*/}
+            {/*                <Accordion.Body>*/}
+            {/*                    {Object.keys(teams[teamID]["teamMembers"]).map(teamMemberID => (*/}
+            {/*                        <Row key={teamMemberID} className="align-items-center mb-2">*/}
+            {/*                            <Col xs={1} md={1}>*/}
+            {/*                                <Form.Label>*/}
+            {/*                                    {teamMemberID}*/}
+            {/*                                </Form.Label>*/}
+            {/*                            </Col>*/}
+            {/*                            <Col xs={11} md={11}>*/}
+            {/*                                <Form.Control*/}
+            {/*                                    name={`teamMemberEntry-${teamID}-${teamMemberID}`}*/}
+            {/*                                    value={teams[teamID].teamMembers[teamMemberID].serviceNumber}*/}
+            {/*                                    placeholder="ServiceNumber"*/}
+            {/*                                    onChange={updateTeamMemberEntry}*/}
+            {/*                                    className={teams[teamID].teamMembers[teamMemberID].valid ? "is-valid" : ""}*/}
+            {/*                                    autoComplete="off"*/}
+            {/*                                />*/}
+            {/*                            </Col>*/}
+            {/*                        </Row>*/}
+            {/*                    ))}*/}
+            {/*                    <Button name={`btnAddMember-${teamID}`} onClick={teamMemberHandler}>*/}
+            {/*                        Add*/}
+            {/*                    </Button>*/}
+            {/*                    <Button name={`btnDelMember-${teamID}`} onClick={teamMemberHandler}>*/}
+            {/*                        Delete*/}
+            {/*                    </Button>*/}
+            {/*                    <Button name={`btnLookUp-${teamID}`} onClick={memberLookUpHandler}>*/}
+            {/*                        Search*/}
+            {/*                    </Button>*/}
+            {/*                </Accordion.Body>*/}
+            {/*            </Accordion.Item>*/}
+            {/*        ))}*/}
+            {/*    </Accordion>*/}
+            {/*</Row>*/}
         </>
     )
 }

@@ -34,16 +34,16 @@ jwt = JWTManager(app)
 db.init_app(app)
 
 from .auth.user import users
-from .validation.validationcreate import validation
-from .validation.validationassess import val_assess
-from .validation.pink import pink
+from .validation.validation import val_management
+from .pink.pink import pink
+from .portal.portal import portal
 from .public.routes import public
 
 app.register_blueprint(users)
-app.register_blueprint(validation)
-app.register_blueprint(val_assess)
+app.register_blueprint(val_management)
 app.register_blueprint(public)
 app.register_blueprint(pink)
+app.register_blueprint(portal)
 
 with app.app_context():
     db.create_all()

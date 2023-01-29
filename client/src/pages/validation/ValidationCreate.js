@@ -8,12 +8,12 @@ import Button from "react-bootstrap/Button";
 import DatePicker from "react-datepicker"
 
 import "react-datepicker/dist/react-datepicker.css";
-import "./ValidationCreate.scss"
 
 import AccordionTeams from "../../components/AccordionTeams";
 import getCookie from "../../services/GetCookie";
 import useMessage from "../../hooks/useMessage";
 import { useNavigate } from "react-router-dom";
+import Table from "react-bootstrap/Table";
 
 
 export default function ValidationCreate(){
@@ -29,14 +29,15 @@ export default function ValidationCreate(){
     const [validated, setValidated] = useState(false)
 
     const [teams, setTeams] = useState({
-        // teamID = 1, memberID = 1
-        //    1: {
-        //     1: {
-        //         serviceNumber: "",
-        //         name: "",
-        //         valid: false (valid is serviceNumber is in the database when checked)
-        //     }
-        // }
+           1: {
+               "teamMembers":{
+                   1: {
+                        "serviceNumber": "",
+                        "valid": false
+                    }
+               }
+
+        }
     });
 
     function updateValidation(e) {
@@ -54,7 +55,7 @@ export default function ValidationCreate(){
         e.preventDefault()
         setValidated(true)
         if (validation.title) {
-            fetch("/validation/create", {
+            fetch("/validation-management/create", {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -63,7 +64,7 @@ export default function ValidationCreate(){
                 },
                 body: JSON.stringify({
                     ...validation,
-                    ["teams"]: {...teams}
+                    "teams": {...teams}
                 })
             }).then(r => {
                 if (r.status === 200) {
@@ -77,17 +78,19 @@ export default function ValidationCreate(){
     }
 
     return (
-        <Container fluid>
+        <div>
+            <h1>Create Validation</h1>
             <Form>
                 <Row className="justify-content-md-center">
-                    <Col xs={12} md={6}>
-                        <Form.Group className="mb-3 text-center">
-                        <Form.Label>Title</Form.Label>
+                    <Col xs={12} md={12}>
+                        <Form.Group className="mb-3">
+                        <Form.Label>Validation Name</Form.Label>
                         <Form.Control
                             name="title"
                             className={`text-center ${validated ? validation.title ? "is-valid" : "is-invalid" : ""}`}
                             type="text"
                             value={validation.title}
+                            placeholder="Validation Name"
                             onChange={updateValidation}
                         />
                         </Form.Group>
@@ -95,8 +98,8 @@ export default function ValidationCreate(){
                 </Row>
                 <Row className="justify-content-center">
                     <Col xs={12} md={6}>
-                        <Form.Group className="mb-3 text-center">
-                            <Form.Label>Date From</Form.Label>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Start Date</Form.Label>
                             <DatePicker
                                 className="text-center form-control"
                                 dateFormat="dd/MM/yyyy"
@@ -104,7 +107,7 @@ export default function ValidationCreate(){
                                 onChange={(date) => setValidation(prevState => {
                                     return {
                                         ...prevState,
-                                        ["dateFrom"]: date
+                                        "dateFrom": date
                                     }
                                 })}
                                 selectsStart
@@ -114,8 +117,8 @@ export default function ValidationCreate(){
                         </Form.Group>
                     </Col>
                     <Col xs={12} md={6}>
-                        <Form.Group className="mb-3 text-center">
-                            <Form.Label>Date To</Form.Label>
+                        <Form.Group className="mb-3">
+                            <Form.Label>End Date</Form.Label>
                             <DatePicker
                                 className="text-center form-control"
                                 dateFormat="dd/MM/yyyy"
@@ -123,7 +126,7 @@ export default function ValidationCreate(){
                                 onChange={(date) => setValidation(prevState => {
                                     return {
                                         ...prevState,
-                                        ["dateTo"]: date
+                                        "dateTo": date
                                     }
                                 })}
                                 selectsEnd
@@ -139,12 +142,12 @@ export default function ValidationCreate(){
 
                 <Row>
                     <Col className="text-center">
-                        <Button variant="primary" type="sumbit" onClick={createValidationHandler}>
+                        <Button variant="primary" type="sumbit" onClick={createValidationHandler} className="w-100">
                             Create
                         </Button>
                     </Col>
                 </Row>
             </Form>
-        </Container>
+        </div>
     )
 }

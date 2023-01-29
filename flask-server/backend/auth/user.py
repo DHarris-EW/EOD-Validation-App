@@ -27,7 +27,13 @@ def refresh_expiring_jwts(response):
         target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
         if target_timestamp > exp_timestamp:
             print("refreshing...")
-            access_token = create_access_token(identity=current_user, additional_claims={"is_admin": current_user.is_admin, "is_ds": current_user.is_ds})
+            roles = ["user"]
+            if current_user.is_admin:
+                roles.append("admin")
+            if current_user.is_ds:
+                roles.append("ds")
+            roles.append(current_user.job_role)
+            access_token = create_access_token(identity=current_user, additional_claims={"roles": roles})
             set_access_cookies(response, access_token)
         return response
     except (RuntimeError, KeyError):
@@ -127,7 +133,7 @@ def login():
             roles.append("admin")
         if user.is_ds:
             roles.append("ds")
-
+        roles.append(user.job_role)
         response = jsonify({"msg": {"text": "Login Successful!",
                                     "type": "success"},
                             "auth": {"id": user.id,

@@ -1,11 +1,12 @@
 import { Card } from "react-bootstrap";
 import getCookie from "../../services/GetCookie";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 
 
@@ -17,7 +18,7 @@ export default function ValidationList() {
 
 
     useEffect(() => {
-        fetch("/validation/assess/validation-list", {
+        fetch("/validation-management/validation-list/read", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -32,20 +33,21 @@ export default function ValidationList() {
                 setAuth({})
             }
         })
-    }, [])
+    }, [setAuth])
 
     function assessBtnHandler(e) {
         const { name } = e.target
-        const title = name.split("-").slice(-1)
-        navigate(`/validation/assess/${title}`)
+        const validation_id = name.split("-").slice(-1)
+        navigate(`/validation/${validation_id}/assess`)
     }
-
 
     return (
         <div className="w-100 text-center">
             <h1 className="text-center">Validation List</h1>
             <Row className="justify-content-center">
-                {validations &&
+                {!validations ?
+                    <LoadingSpinner />
+                    :
                     Object.values(validations).map(validation => (
                         <Col key={validation.id} xs={12} lg={6}>
                             <Card className="text-center mb-3">
@@ -55,7 +57,7 @@ export default function ValidationList() {
                                     <Card.Text>Date To: {validation.date_to}</Card.Text>
                                     <Button
                                         variant="success"
-                                        name={`btnAssess-${validation.title}`}
+                                        name={`btnAssess-${validation.id}`}
                                         onClick={assessBtnHandler}
                                     >
                                         Assess
