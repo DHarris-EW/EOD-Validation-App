@@ -44,7 +44,15 @@ export default function PortalAdmin() {
                     {filter.displaySelect === "pinkScoreAverages" &&
                         <PinkAnalysis
                             criteria={analysis.trends[filter.pinkType].criteriaAverage}
-                            section={analysis.trends[filter.pinkType].sectionScoreAverage} filter={filter}
+                            section={analysis.trends[filter.pinkType].sectionScoreAverage}
+                            filter={filter}
+                        />
+                    }
+                    {filter.displaySelect === "pinkScoreFreq" &&
+                        <PinkAnalysis
+                            criteria={analysis.trends[filter.pinkType].criteriaAverage}
+                            section={analysis.trends[filter.pinkType].sectionScoreAverage}
+                            filter={filter}
                         />
                     }
                     {filter.displaySelect === "performanceTrends" &&
